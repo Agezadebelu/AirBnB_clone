@@ -6,12 +6,11 @@ import json
 from models.base_model import BaseModel
 from models import storage
 
-
 class HBNBCommand(cmd.Cmd):
     """Command interpreter class for HBNB project."""
     
     prompt = "(hbnb) "
-    valid_classes = ["BaseModel", "User", "State", "City", "Amenity", "Place", "Review"]
+    valid_classes = ["BaseModel", "User", "State", "City", "Amenity", "Place", "Review"]  # Add other valid classes as needed
 
     def do_quit(self, arg):
         """Quit command to exit the program."""
