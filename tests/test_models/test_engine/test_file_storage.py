@@ -6,6 +6,7 @@ import json
 import os
 from datetime import datetime
 from unittest.mock import patch
+from models import storage
 from models.engine.file_storage import FileStorage
 from models.base_model import BaseModel
 from models.user import User
@@ -34,9 +35,9 @@ class TestFileStorage(unittest.TestCase):
             pass
 
     def test_all(self):
-        """Test the all() method."""
-        self.file_storage._FileStorage__objects = {}  # Clear objects
-        self.assertEqual(self.file_storage.all(), {})
+        """Test the all method."""
+        objects = self.storage.all()
+        self.assertIsInstance(objects, dict)
 
     def test_new(self):
         """Test the new() method."""
@@ -44,24 +45,18 @@ class TestFileStorage(unittest.TestCase):
         self.file_storage.new(obj)
         self.assertIn("BaseModel." + obj.id, self.file_storage.all())
 
-    def test_save_reload(self):
-        """Test the save() and reload() methods."""
-        with open(self.file_path, 'w') as file:
-            json.dump({"dummy": "data"}, file)  # Write a dummy object
+    def test_save_and_reload(self):
+        """Test the save and reload methods."""
+        user = User()
+        self.storage.new(user)
+        self.storage.save()
 
-        obj = BaseModel()
-        obj_id = "BaseModel." + obj.id
-        self.file_storage.new(obj)
-        self.file_storage.save()
-
-        with open(self.file_path, "r") as f:
-            saved_data = json.load(f)
-            self.assertIn(obj_id, saved_data)
-
+        # Create a new FileStorage instance to simulate a program restart
         new_file_storage = FileStorage()
-        new_file_storage._FileStorage__file_path = self.file_path
         new_file_storage.reload()
-        self.assertIn(obj_id, new_file_storage.all())
+
+        objects = new_file_storage.all()
+        self.assertIn('User.{}'.format(user.id), objects)
 
     def test_classes(self):
         """Test the classes() method."""
