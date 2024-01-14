@@ -36,7 +36,7 @@ class TestFileStorage(unittest.TestCase):
 
     def test_all(self):
         """Test the all method."""
-        objects = self.storage.all()
+        objects = self.file_storage.all()
         self.assertIsInstance(objects, dict)
 
     def test_new(self):
@@ -48,8 +48,8 @@ class TestFileStorage(unittest.TestCase):
     def test_save_and_reload(self):
         """Test the save and reload methods."""
         user = User()
-        self.storage.new(user)
-        self.storage.save()
+        self.file_storage.new(user)
+        self.file_storage.save()
 
         # Create a new FileStorage instance to simulate a program restart
         new_file_storage = FileStorage()
