@@ -24,7 +24,7 @@ class HBNBCommand(cmd.Cmd):
         print()  # Print a newline before exiting
         return True
 
-    def handle_empty_line(self):
+    def emptyline(self):
         """Eliminates empty lines"""
         pass
 
