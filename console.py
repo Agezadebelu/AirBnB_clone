@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
 """Module for HBNBCommand class."""
+
 import cmd
 import re
 import json
 from models.base_model import BaseModel
 from models import storage
 
+
 class HBNBCommand(cmd.Cmd):
     """Command interpreter class for HBNB project."""
     
     prompt = "(hbnb) "
-    valid_classes = ["BaseModel", "User", "State", "City", "Amenity", "Place", "Review"]  # Add other valid classes as needed
 
     def do_quit(self, arg):
         """Quit command to exit the program."""
@@ -34,10 +35,10 @@ class HBNBCommand(cmd.Cmd):
         if not arg:
             print("** class name missing **")
             return
-        if arg not in self.valid_classes:
+        if arg not in storage.classes():
             print("** class doesn't exist **")
             return
-        new_instance = eval("{}()".format(arg))
+        new_instance = storage.classes()[arg]()
         new_instance.save()
         print(new_instance.id)
 
@@ -46,7 +47,7 @@ class HBNBCommand(cmd.Cmd):
         args = arg.split()
         if not args:
             print("** class name missing **")
-        elif args[0] not in self.valid_classes:
+        elif args[0] not in storage.classes():
             print("** class doesn't exist **")
         elif len(args) < 2:
             print("** instance id missing **")
@@ -62,7 +63,7 @@ class HBNBCommand(cmd.Cmd):
         args = arg.split()
         if not args:
             print("** class name missing **")
-        elif args[0] not in self.valid_classes:
+        elif args[0] not in storage.classes():
             print("** class doesn't exist **")
         elif len(args) < 2:
             print("** instance id missing **")
@@ -76,34 +77,64 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, arg):
         """Prints all string representations of instances."""
-        args = arg.split()
-        if not args or args[0] not in self.valid_classes:
-            print("** class doesn't exist **")
-            return
-        objects = storage.all()
-        result = [str(obj) for obj in objects.values() if type(obj).__name__ == args[0]]
-        print(result)
+        if arg != "":
+            words = arg.split(' ')
+            if words[0] not in storage.classes():
+                print("** class doesn't exist **")
+            else:
+                nl = [str(obj) for key, obj in storage.all().items()
+                      if type(obj).__name__ == words[0]]
+                print(nl)
+        else:
+            new_list = [str(obj) for key, obj in storage.all().items()]
+            print(new_list)
         
     def do_update(self, arg):
-        """Updates an instance based on the class name and id."""
-        args = arg.split()
-        if not args:
+        """Updates an instance by adding or updating attribute.
+        """
+        if arg == "" or arg is None:
             print("** class name missing **")
-        elif args[0] not in self.valid_classes:
+            return
+
+        rex = r'^(\S+)(?:\s(\S+)(?:\s(\S+)(?:\s((?:"[^"]*")|(?:(\S)+)))?)?)?'
+        match = re.search(rex, arg)
+        classname = match.group(1)
+        uid = match.group(2)
+        attribute = match.group(3)
+        value = match.group(4)
+        if not match:
+            print("** class name missing **")
+        elif classname not in storage.classes():
             print("** class doesn't exist **")
-        elif len(args) < 2:
+        elif uid is None:
             print("** instance id missing **")
-        elif "{}.{}".format(args[0], args[1]) not in storage.all():
-            print("** no instance found **")
-        elif len(args) < 3:
-            print("** attribute name missing **")
-        elif len(args) < 4:
-            print("** value missing **")
         else:
-            key = "{}.{}".format(args[0], args[1])
-            obj = storage.all()[key]
-            setattr(obj, args[2], eval(args[3]))
-            storage.save()
+            key = "{}.{}".format(classname, uid)
+            if key not in storage.all():
+                print("** no instance found **")
+            elif not attribute:
+                print("** attribute name missing **")
+            elif not value:
+                print("** value missing **")
+            else:
+                cast = None
+                if not re.search('^".*"$', value):
+                    if '.' in value:
+                        cast = float
+                    else:
+                        cast = int
+                else:
+                    value = value.replace('"', '')
+                attributes = storage.attributes()[classname]
+                if attribute in attributes:
+                    value = attributes[attribute](value)
+                elif cast:
+                    try:
+                        value = cast(value)
+                    except ValueError:
+                        pass  # fine, stay a string then
+                setattr(storage.all()[key], attribute, value)
+                storage.all()[key].save()
 
     def default(self, arg):
         """Catch commands if nothing else matches then."""
