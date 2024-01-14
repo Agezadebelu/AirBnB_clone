@@ -28,9 +28,9 @@ class HBNBCommand(cmd.Cmd):
         """To get help on a command, type help <topic>."""
         return super().do_help(arg)
 
-    def handle_empty_line(self, arg):
+    def handle_empty_line(self):
         """Eliminates empty lines"""
-        return False
+        pass
 
     def do_create(self, arg):
         """Creates an instance.
