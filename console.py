@@ -24,10 +24,6 @@ class HBNBCommand(cmd.Cmd):
         print()  # Print a newline before exiting
         return True
 
-    def do_help(self, arg):
-        """To get help on a command, type help <topic>."""
-        return super().do_help(arg)
-
     def handle_empty_line(self):
         """Eliminates empty lines"""
         pass
