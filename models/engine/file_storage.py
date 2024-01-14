@@ -7,8 +7,7 @@ import os
 
 
 class FileStorage:
-     """Class for storing and retrieving data"""
-
+    """Class for storing and retrieving data"""
     __file_path = "file.json"
     __objects = {}
 
