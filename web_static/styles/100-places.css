@@ -74,14 +74,14 @@ div.description {
     margin-top: 10px;
 }
 
-.amenities1 {
+.places .amenities {
     margin-top: 40px;
     width: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.amenities1 h2 {
+.places .amenities h2 {
     font-size: 16px;
     border-bottom: 1px solid #DDDDDD;
     text-align: left;
@@ -89,7 +89,7 @@ div.description {
     padding-bottom: 10px;
 }
 
-.amenities1 ul li {
+.places .amenities ul li {
     list-style: none;
     text-align: left;
     height: 25px;
